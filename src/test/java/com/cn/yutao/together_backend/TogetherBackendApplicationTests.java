@@ -39,6 +39,7 @@ class TogetherBackendApplicationTests {
             createdUser = CreateUserDTO.builder()
                     .username("testUser")
                     .password("testPassword")
+                    .nickname("testName")
                     .build();
         }
 
@@ -51,8 +52,9 @@ class TogetherBackendApplicationTests {
             assertThat(user).isNotNull();
             assertThat(user.getUsername()).isEqualTo(createdUser.getUsername());
             assertThat(user.getPassword()).isEqualTo(createdUser.getPassword());
+            assertThat(user.getNickname()).isEqualTo(createdUser.getNickname());
         }
     }
 
-    
+
 }

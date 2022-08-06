@@ -25,6 +25,7 @@ public class UserController {
         User user = new User();
         user.setUsername(createUserDTO.getUsername());
         user.setPassword(createUserDTO.getPassword());
+        user.setNickname(createUserDTO.getNickname());
 
         return userRepository.save(user);
     }

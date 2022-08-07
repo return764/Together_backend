@@ -1,10 +1,12 @@
 package com.cn.yutao.together_backend.controller;
 
+import cn.hutool.core.util.IdUtil;
 import com.cn.yutao.together_backend.entity.User;
 import com.cn.yutao.together_backend.repository.UserRepository;
 import com.cn.yutao.together_backend.service.UserService;
 import org.junit.jupiter.api.Nested;
 import org.junit.jupiter.api.Test;
+import org.mockito.Mockito;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.json.AutoConfigureJsonTesters;
 import org.springframework.boot.test.autoconfigure.web.servlet.WebMvcTest;
@@ -39,10 +41,13 @@ public class UserControllerTest {
                     .username("testUser")
                     .password("testPassword")
                     .nickname("testName")
+                    .identifyCode("AL2X9L")
                     .build();
             when(userService.createUser(createdUser)).thenReturn(createdUser);
+            Mockito.mockStatic(IdUtil.class).when(IdUtil::fastSimpleUUID).thenReturn("al2x9lcas2");
 
-            final var response = mockMvc.perform(post("/users").contentType(MediaType.APPLICATION_JSON)
+            final var response = mockMvc.perform(post("/users")
+                            .contentType(MediaType.APPLICATION_JSON)
                             .content(userJson.write(createdUser).getJson()))
                     .andReturn()
                     .getResponse();

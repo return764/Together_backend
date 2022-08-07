@@ -1,6 +1,7 @@
 package com.cn.yutao.together_backend.controller;
 
 
+import cn.hutool.core.util.IdUtil;
 import com.cn.yutao.together_backend.entity.User;
 import com.cn.yutao.together_backend.entity.dto.CreateUserDTO;
 import com.cn.yutao.together_backend.service.UserService;
@@ -28,6 +29,8 @@ public class UserController {
         user.setUsername(createUserDTO.getUsername());
         user.setPassword(createUserDTO.getPassword());
         user.setNickname(createUserDTO.getNickname());
+        final var idCode = IdUtil.fastSimpleUUID().substring(0, 6).toUpperCase();
+        user.setIdentifyCode(idCode);
 
         return userService.createUser(user);
     }

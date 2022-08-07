@@ -3,7 +3,7 @@ package com.cn.yutao.together_backend.controller;
 
 import com.cn.yutao.together_backend.entity.User;
 import com.cn.yutao.together_backend.entity.dto.CreateUserDTO;
-import com.cn.yutao.together_backend.repository.UserRepository;
+import com.cn.yutao.together_backend.service.UserService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.web.bind.annotation.PostMapping;
@@ -19,7 +19,7 @@ import javax.validation.Valid;
 public class UserController {
 
     @Autowired
-    UserRepository userRepository;
+    UserService userService;
 
     @ResponseStatus(HttpStatus.CREATED)
     @PostMapping
@@ -29,6 +29,7 @@ public class UserController {
         user.setPassword(createUserDTO.getPassword());
         user.setNickname(createUserDTO.getNickname());
 
-        return userRepository.save(user);
+        return userService.createUser(user);
     }
+
 }

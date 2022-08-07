@@ -2,6 +2,7 @@ package com.cn.yutao.together_backend.controller;
 
 import com.cn.yutao.together_backend.entity.User;
 import com.cn.yutao.together_backend.repository.UserRepository;
+import com.cn.yutao.together_backend.service.UserService;
 import org.junit.jupiter.api.Nested;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -23,7 +24,7 @@ import static org.springframework.test.web.servlet.request.MockMvcRequestBuilder
 public class UserControllerTest {
 
     @MockBean
-    UserRepository userRepository;
+    UserService userService;
     @Autowired
     private MockMvc mockMvc;
     @Autowired
@@ -39,7 +40,7 @@ public class UserControllerTest {
                     .password("testPassword")
                     .nickname("testName")
                     .build();
-            when(userRepository.save(createdUser)).thenReturn(createdUser);
+            when(userService.createUser(createdUser)).thenReturn(createdUser);
 
             final var response = mockMvc.perform(post("/users").contentType(MediaType.APPLICATION_JSON)
                             .content(userJson.write(createdUser).getJson()))
@@ -47,7 +48,7 @@ public class UserControllerTest {
                     .getResponse();
 
             assertThat(response.getStatus()).isEqualTo(HttpStatus.CREATED.value());
-            verify(userRepository).save(createdUser);
+            verify(userService).createUser(createdUser);
         }
     }
 }

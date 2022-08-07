@@ -41,10 +41,8 @@ public class UserControllerTest {
                     .username("testUser")
                     .password("testPassword")
                     .nickname("testName")
-                    .identifyCode("AL2X9L")
                     .build();
             when(userService.createUser(createdUser)).thenReturn(createdUser);
-            Mockito.mockStatic(IdUtil.class).when(IdUtil::fastSimpleUUID).thenReturn("al2x9lcas2");
 
             final var response = mockMvc.perform(post("/users")
                             .contentType(MediaType.APPLICATION_JSON)

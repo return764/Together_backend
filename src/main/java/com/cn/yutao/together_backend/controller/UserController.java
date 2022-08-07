@@ -5,6 +5,7 @@ import cn.hutool.core.util.IdUtil;
 import com.cn.yutao.together_backend.entity.User;
 import com.cn.yutao.together_backend.entity.dto.CreateUserDTO;
 import com.cn.yutao.together_backend.service.UserService;
+import org.springframework.beans.BeanUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.web.bind.annotation.PostMapping;
@@ -26,11 +27,7 @@ public class UserController {
     @PostMapping
     public User register(@RequestBody @Valid CreateUserDTO createUserDTO) {
         User user = new User();
-        user.setUsername(createUserDTO.getUsername());
-        user.setPassword(createUserDTO.getPassword());
-        user.setNickname(createUserDTO.getNickname());
-        final var idCode = IdUtil.fastSimpleUUID().substring(0, 6).toUpperCase();
-        user.setIdentifyCode(idCode);
+        BeanUtils.copyProperties(createUserDTO, user);
 
         return userService.createUser(user);
     }

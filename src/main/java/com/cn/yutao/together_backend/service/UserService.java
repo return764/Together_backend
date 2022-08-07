@@ -6,6 +6,8 @@ import com.cn.yutao.together_backend.repository.UserRepository;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
+import java.util.Optional;
+
 @Service
 public class UserService {
 
@@ -13,8 +15,17 @@ public class UserService {
     UserRepository userRepository;
 
     public User createUser(User user) {
-        final var idCode = IdUtil.fastSimpleUUID().substring(0, 6).toUpperCase();
-        user.setIdentifyCode(idCode);
+        user.setIdentifyCode(generateIdCode());
         return userRepository.save(user);
+    }
+
+    private String generateIdCode() {
+        var idCode = IdUtil.fastSimpleUUID().substring(0, 6).toUpperCase();
+        final var identifyCodeUserOptional = userRepository.findByIdentifyCode(idCode);
+
+        if (identifyCodeUserOptional.isPresent()) {
+            idCode = generateIdCode();
+        }
+        return idCode;
     }
 }

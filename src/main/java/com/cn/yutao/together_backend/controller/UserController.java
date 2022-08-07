@@ -22,7 +22,7 @@ public class UserController {
     UserRepository userRepository;
 
     @ResponseStatus(HttpStatus.CREATED)
-    @PostMapping("/register")
+    @PostMapping
     public User register(@RequestBody @Valid CreateUserDTO createUserDTO) {
         User user = new User();
         user.setUsername(createUserDTO.getUsername());

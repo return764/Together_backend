@@ -49,7 +49,7 @@ class TogetherBackendApplicationTests {
 
         @Test
         void should_register_user() {
-            final var responseEntity = restTemplate.postForEntity("/users/register", createdUser, User.class);
+            final var responseEntity = restTemplate.postForEntity("/users", createdUser, User.class);
 
             assertThat(responseEntity.getStatusCode()).isEqualTo(HttpStatus.CREATED);
             final var user = responseEntity.getBody();
@@ -66,7 +66,7 @@ class TogetherBackendApplicationTests {
                     .password("testpassword")
                     .username("")
                     .build();
-            final var responseEntity = restTemplate.postForEntity("/users/register", failedCreateUser, ErrorResult.class);
+            final var responseEntity = restTemplate.postForEntity("/users", failedCreateUser, ErrorResult.class);
 
             assertThat(responseEntity.getStatusCode()).isEqualTo(HttpStatus.BAD_REQUEST);
             assertThat(responseEntity.getHeaders().getContentType()).isEqualTo(MediaType.APPLICATION_JSON);

@@ -12,6 +12,8 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.ResponseStatus;
 import org.springframework.web.bind.annotation.RestController;
 
+import javax.validation.Valid;
+
 @RestController
 @RequestMapping("/users")
 public class UserController {
@@ -21,7 +23,7 @@ public class UserController {
 
     @ResponseStatus(HttpStatus.CREATED)
     @PostMapping("/register")
-    public User register(@RequestBody CreateUserDTO createUserDTO) {
+    public User register(@RequestBody @Valid CreateUserDTO createUserDTO) {
         User user = new User();
         user.setUsername(createUserDTO.getUsername());
         user.setPassword(createUserDTO.getPassword());

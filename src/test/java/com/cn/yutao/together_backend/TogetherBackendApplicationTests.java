@@ -2,6 +2,7 @@ package com.cn.yutao.together_backend;
 
 import com.cn.yutao.together_backend.entity.User;
 import com.cn.yutao.together_backend.entity.dto.CreateUserDTO;
+import com.cn.yutao.together_backend.exception.ErrorResult;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Nested;
 import org.junit.jupiter.api.Test;
@@ -9,6 +10,9 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.boot.test.web.client.TestRestTemplate;
 import org.springframework.http.HttpStatus;
+import org.springframework.http.MediaType;
+
+import java.util.Objects;
 
 import static org.assertj.core.api.Assertions.assertThat;
 
@@ -53,6 +57,20 @@ class TogetherBackendApplicationTests {
             assertThat(user.getUsername()).isEqualTo(createdUser.getUsername());
             assertThat(user.getPassword()).isEqualTo(createdUser.getPassword());
             assertThat(user.getNickname()).isEqualTo(createdUser.getNickname());
+        }
+
+        @Test
+        void should_register_failed_when_given_incorrect_params() {
+            final var failedCreateUser = CreateUserDTO.builder()
+                    .nickname("testnickname")
+                    .password("testpassword")
+                    .username("")
+                    .build();
+            final var responseEntity = restTemplate.postForEntity("/users/register", failedCreateUser, ErrorResult.class);
+
+            assertThat(responseEntity.getStatusCode()).isEqualTo(HttpStatus.BAD_REQUEST);
+            assertThat(responseEntity.getHeaders().getContentType()).isEqualTo(MediaType.APPLICATION_JSON);
+            assertThat(Objects.requireNonNull(responseEntity.getBody()).getMessage()).contains("username must be not blank");
         }
     }
 

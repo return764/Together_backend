@@ -3,6 +3,7 @@ package com.cn.yutao.together_backend.service;
 import cn.hutool.core.util.IdUtil;
 import com.cn.yutao.together_backend.entity.User;
 import com.cn.yutao.together_backend.repository.UserRepository;
+import com.cn.yutao.together_backend.utils.IdentifyCodeUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
@@ -20,7 +21,7 @@ public class UserService {
     }
 
     private String generateIdCode() {
-        var idCode = IdUtil.fastSimpleUUID().substring(0, 6).toUpperCase();
+        var idCode = IdentifyCodeUtils.genIdCode();
         final var identifyCodeUserOptional = userRepository.findByIdentifyCode(idCode);
 
         if (identifyCodeUserOptional.isPresent()) {

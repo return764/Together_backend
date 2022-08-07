@@ -1,8 +1,8 @@
 package com.cn.yutao.together_backend.service;
 
-import cn.hutool.core.util.IdUtil;
 import com.cn.yutao.together_backend.entity.User;
 import com.cn.yutao.together_backend.repository.UserRepository;
+import com.cn.yutao.together_backend.utils.IdentifyCodeUtils;
 import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
@@ -32,40 +32,38 @@ class UserServiceTest {
     private User user;
     private User userStored;
     private User secondUserStored;
+    private String firstCode;
+    private String secondCode;
 
     @BeforeAll
     void beforeAll() {
-        Mockito.mockStatic(IdUtil.class);
+        Mockito.mockStatic(IdentifyCodeUtils.class);
+        firstCode = "AX2FL9";
+        secondCode = "VF2DG3";
     }
 
     @BeforeEach
     void beforeEach() {
         // given
-        user = User.builder()
+        final var commonUserBuilder = User.builder()
                 .nickname("testName")
                 .username("testName")
-                .password("testPassword")
+                .password("testPassword");
+        user = commonUserBuilder
                 .build();
-        userStored = User.builder()
-                .nickname("testName")
-                .username("testName")
-                .password("testPassword")
-                .identifyCode("AX2FL9")
+        userStored = commonUserBuilder
+                .identifyCode(firstCode)
                 .build();
-        secondUserStored = User.builder()
-                .nickname("testName")
-                .username("testName")
-                .password("testPassword")
-                .identifyCode("VF2DG3")
+        secondUserStored = commonUserBuilder
+                .identifyCode(secondCode)
                 .build();
-
     }
 
     @Test
     void should_create_user_correctly() {
         // given
         when(repository.save(user)).thenReturn(userStored);
-        Mockito.when(IdUtil.fastSimpleUUID()).thenReturn("ax2fl9safw921v8");
+        Mockito.when(IdentifyCodeUtils.genIdCode()).thenReturn(firstCode);
         // when
         final var savedUser = userService.createUser(user);
         // then
@@ -76,14 +74,12 @@ class UserServiceTest {
     @Test
     void should_remake_identify_code_when_generate_same_code() {
         // given
-        final var firstCode = "AX2FL9";
-        final var secondCode = "VF2DG3";
         when(repository.findByIdentifyCode(firstCode)).thenReturn(Optional.of(userStored));
         when(repository.findByIdentifyCode(secondCode)).thenReturn(Optional.empty());
         when(repository.save(user)).thenReturn(secondUserStored);
-        Mockito.when(IdUtil.fastSimpleUUID())
-                .thenReturn("ax2fl9safw921v8")
-                .thenReturn("vf2dg3cz8vb0ab3");
+        Mockito.when(IdentifyCodeUtils.genIdCode())
+                .thenReturn(firstCode)
+                .thenReturn(secondCode);
         // when
         final var newStoredUser = userService.createUser(user);
         // then

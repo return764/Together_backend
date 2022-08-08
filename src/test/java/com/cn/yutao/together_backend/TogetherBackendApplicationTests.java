@@ -57,6 +57,8 @@ class TogetherBackendApplicationTests {
             assertThat(user.getUsername()).isEqualTo(createdUser.getUsername());
             assertThat(user.getPassword()).isEqualTo(createdUser.getPassword());
             assertThat(user.getNickname()).isEqualTo(createdUser.getNickname());
+            assertThat(user.getIdentifyCode()).isNotNull();
+            assertThat(user.getPoint()).isZero();
         }
 
         @Test

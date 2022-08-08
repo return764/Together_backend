@@ -4,11 +4,13 @@ package com.cn.yutao.together_backend.repository;
 import com.cn.yutao.together_backend.entity.User;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.boot.test.autoconfigure.jdbc.AutoConfigureTestDatabase;
 import org.springframework.boot.test.autoconfigure.orm.jpa.DataJpaTest;
 import org.springframework.boot.test.autoconfigure.orm.jpa.TestEntityManager;
 
 import static org.assertj.core.api.Assertions.assertThat;
 
+@AutoConfigureTestDatabase(replace = AutoConfigureTestDatabase.Replace.NONE)
 @DataJpaTest
 class UserRepositoryTest {
 
@@ -26,10 +28,14 @@ class UserRepositoryTest {
                 .username("testUsername")
                 .password("testPassword")
                 .identifyCode(idCode).build();
-        entityManager.persistAndFlush(user);
+
+        entityManager.persist(user);
         // when
-        final var foundUser = userRepository.findByIdentifyCode(idCode);
+        final var foundUserOpt = userRepository.findByIdentifyCode(idCode);
+
         // then
-        assertThat(foundUser).isPresent().contains(user);
+        assertThat(foundUserOpt).isPresent().contains(user);
+        final var foundUser = foundUserOpt.get();
+        assertThat(foundUser.getPoint()).isZero();
     }
 }

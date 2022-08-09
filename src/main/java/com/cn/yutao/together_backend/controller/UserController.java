@@ -1,7 +1,6 @@
 package com.cn.yutao.together_backend.controller;
 
 
-import cn.hutool.core.util.IdUtil;
 import com.cn.yutao.together_backend.entity.User;
 import com.cn.yutao.together_backend.entity.dto.CreateUserDTO;
 import com.cn.yutao.together_backend.service.UserService;
@@ -23,13 +22,12 @@ public class UserController {
     @Autowired
     UserService userService;
 
-    @ResponseStatus(HttpStatus.CREATED)
     @PostMapping
+    @ResponseStatus(HttpStatus.CREATED)
     public User register(@RequestBody @Valid CreateUserDTO createUserDTO) {
         User user = new User();
         BeanUtils.copyProperties(createUserDTO, user);
 
         return userService.createUser(user);
     }
-
 }

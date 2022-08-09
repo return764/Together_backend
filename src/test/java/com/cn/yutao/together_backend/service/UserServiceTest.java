@@ -12,6 +12,7 @@ import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.Mockito;
 import org.mockito.junit.jupiter.MockitoExtension;
+import org.springframework.security.crypto.password.PasswordEncoder;
 
 import java.util.Optional;
 
@@ -26,9 +27,11 @@ class UserServiceTest {
 
     @Mock
     UserRepository repository;
-
+    @Mock
+    PasswordEncoder passwordEncoder;
     @InjectMocks
     UserService userService;
+
     private User user;
     private User userStored;
     private User secondUserStored;
@@ -38,8 +41,8 @@ class UserServiceTest {
     @BeforeAll
     void beforeAll() {
         Mockito.mockStatic(IdentifyCodeUtils.class);
-        firstCode = "AX2FL9";
-        secondCode = "VF2DG3";
+        firstCode = "111111";
+        secondCode = "222222";
     }
 
     @BeforeEach
@@ -57,6 +60,7 @@ class UserServiceTest {
         secondUserStored = commonUserBuilder
                 .identifyCode(secondCode)
                 .build();
+        when(passwordEncoder.encode(user.getPassword())).thenReturn(user.getPassword());
     }
 
     @Test

@@ -3,17 +3,20 @@ package com.cn.yutao.together_backend.service;
 import com.cn.yutao.together_backend.entity.User;
 import com.cn.yutao.together_backend.repository.UserRepository;
 import com.cn.yutao.together_backend.utils.IdentifyCodeUtils;
-import org.springframework.beans.factory.annotation.Autowired;
+import lombok.AllArgsConstructor;
+import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 
 @Service
+@AllArgsConstructor
 public class UserService {
 
-    @Autowired
-    UserRepository userRepository;
+    private UserRepository userRepository;
+    private PasswordEncoder passwordEncoder;
 
     public User createUser(User user) {
         user.setIdentifyCode(generateIdCode());
+        user.setPassword(passwordEncoder.encode(user.getPassword()));
         return userRepository.save(user);
     }
 

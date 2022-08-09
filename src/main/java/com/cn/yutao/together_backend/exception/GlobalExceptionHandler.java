@@ -23,4 +23,10 @@ public class GlobalExceptionHandler {
                 .collect(Collectors.joining(";"));
         return new ErrorResult(errMessage);
     }
+
+    @ExceptionHandler(Exception.class)
+    @ResponseStatus(HttpStatus.INTERNAL_SERVER_ERROR)
+    public ErrorResult handleOtherException(Exception e) {
+        return new ErrorResult(e.getMessage());
+    }
 }

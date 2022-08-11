@@ -1,7 +1,9 @@
 package com.cn.yutao.together_backend.controller;
 
 import com.cn.yutao.together_backend.entity.User;
+import com.cn.yutao.together_backend.entity.dto.LoginDTO;
 import com.cn.yutao.together_backend.service.UserService;
+import com.fasterxml.jackson.databind.ObjectMapper;
 import org.junit.jupiter.api.Nested;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -12,12 +14,15 @@ import org.springframework.boot.test.json.JacksonTester;
 import org.springframework.boot.test.mock.mockito.MockBean;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
+import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.test.web.servlet.MockMvc;
 
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
+import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.content;
+import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 
 @WebMvcTest(UserController.class)
 @AutoConfigureMockMvc(addFilters = false)
@@ -30,6 +35,8 @@ public class UserControllerTest {
     private MockMvc mockMvc;
     @Autowired
     private JacksonTester<User> userJson;
+    @Autowired
+    private ObjectMapper om;
 
 
     @Nested
@@ -52,6 +59,30 @@ public class UserControllerTest {
 
             assertThat(response.getStatus()).isEqualTo(HttpStatus.CREATED.value());
             verify(userService).createUser(createdUser);
+        }
+    }
+
+    @Nested
+    class LoginTest {
+        @Test
+        void should_login_successfully() throws Exception {
+            // given
+            final var pwd = "testPassword";
+            final var uname = "testUsername";
+            LoginDTO loginDTO = new LoginDTO();
+            User user = new User();
+            loginDTO.setPassword(pwd);
+            loginDTO.setUsername(uname);
+            UsernamePasswordAuthenticationToken token = UsernamePasswordAuthenticationToken.unauthenticated(uname, pwd);
+            when(userService.login(token)).thenReturn(user);
+            // when
+            // then
+            mockMvc.perform(post("/users/login")
+                            .contentType(MediaType.APPLICATION_JSON)
+                            .content(om.writeValueAsString(loginDTO))
+                    ).andExpect(status().isOk())
+                    .andExpect(content().contentType(MediaType.APPLICATION_JSON))
+                    .andExpect(content().string(userJson.write(user).getJson()));
         }
     }
 }

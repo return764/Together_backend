@@ -2,8 +2,10 @@ package com.cn.yutao.together_backend;
 
 import com.cn.yutao.together_backend.entity.User;
 import com.cn.yutao.together_backend.entity.dto.CreateUserDTO;
+import com.cn.yutao.together_backend.entity.dto.LoginDTO;
 import com.cn.yutao.together_backend.exception.ErrorResult;
 import com.cn.yutao.together_backend.service.UserService;
+import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Nested;
 import org.junit.jupiter.api.Test;
@@ -13,7 +15,6 @@ import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.boot.test.web.client.TestRestTemplate;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
-import org.springframework.security.crypto.password.PasswordEncoder;
 
 import java.util.Objects;
 
@@ -28,9 +29,20 @@ class TogetherBackendApplicationTests {
 
     @Autowired
     UserService userService;
+    private User userInDatabase;
+    private String originPassword;
 
-    @Autowired
-    PasswordEncoder passwordEncoder;
+    @BeforeAll
+    void setUp() {
+        originPassword = "testPassword";
+        userInDatabase = User.builder()
+                .username("testUsername")
+                .password(originPassword)
+                .nickname("testNickname")
+                .build();
+        userService.createUser(userInDatabase);
+    }
+
 
     @Nested
     class HelloWorldTest {
@@ -38,7 +50,7 @@ class TogetherBackendApplicationTests {
         void should_hello_world() {
             final var responseEntity =
                     restTemplate
-                            .withBasicAuth("root", "123456789")
+                            .withBasicAuth(userInDatabase.getUsername(), originPassword)
                             .getForEntity("/hello", String.class);
 
             assertThat(responseEntity.getBody()).isEqualTo("World");
@@ -68,7 +80,6 @@ class TogetherBackendApplicationTests {
             final var user = responseEntity.getBody();
             assertThat(user).isNotNull();
             assertThat(user.getUsername()).isEqualTo(createdUser.getUsername());
-            assertThat(passwordEncoder.matches(createdUser.getPassword(), user.getPassword())).isTrue();
             assertThat(user.getNickname()).isEqualTo(createdUser.getNickname());
             assertThat(user.getIdentifyCode()).isNotNull();
             assertThat(user.getPoint()).isZero();
@@ -86,6 +97,18 @@ class TogetherBackendApplicationTests {
             assertThat(responseEntity.getStatusCode()).isEqualTo(HttpStatus.BAD_REQUEST);
             assertThat(responseEntity.getHeaders().getContentType()).isEqualTo(MediaType.APPLICATION_JSON);
             assertThat(Objects.requireNonNull(responseEntity.getBody()).getMessage()).contains("username must be not blank");
+        }
+
+        @Test
+        void should_login_successfully() {
+            LoginDTO loginDTO = new LoginDTO();
+            loginDTO.setUsername(userInDatabase.getUsername());
+            loginDTO.setPassword(originPassword);
+            final var responseEntity = restTemplate.postForEntity("/users/login", loginDTO, User.class);
+
+            assertThat(responseEntity.getStatusCode()).isEqualTo(HttpStatus.OK);
+            final var user = responseEntity.getBody();
+            assertThat(user).isNotNull();
         }
     }
 

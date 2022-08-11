@@ -1,6 +1,7 @@
 package com.cn.yutao.together_backend.service;
 
 import com.cn.yutao.together_backend.entity.User;
+import com.cn.yutao.together_backend.exception.UserNotFoundException;
 import com.cn.yutao.together_backend.repository.UserRepository;
 import com.cn.yutao.together_backend.utils.IdentifyCodeUtils;
 import lombok.AllArgsConstructor;
@@ -28,5 +29,9 @@ public class UserService {
             idCode = generateIdCode();
         }
         return idCode;
+    }
+
+    public User getUserByUsername(String username) {
+        return userRepository.findByUsername(username).orElseThrow(() -> new UserNotFoundException("User "+username+" not found."));
     }
 }

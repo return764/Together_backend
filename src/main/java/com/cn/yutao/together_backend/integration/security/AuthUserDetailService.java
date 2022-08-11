@@ -12,7 +12,6 @@ import org.springframework.stereotype.Service;
 
 
 @Service
-@ConditionalOnProperty(name = "spring.profiles.active", havingValue = "dev", matchIfMissing = true)
 public class AuthUserDetailService implements UserDetailsService {
 
     @Autowired

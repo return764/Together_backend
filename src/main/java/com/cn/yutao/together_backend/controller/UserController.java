@@ -3,10 +3,17 @@ package com.cn.yutao.together_backend.controller;
 
 import com.cn.yutao.together_backend.entity.User;
 import com.cn.yutao.together_backend.entity.dto.CreateUserDTO;
+import com.cn.yutao.together_backend.entity.dto.LoginDTO;
 import com.cn.yutao.together_backend.service.UserService;
 import org.springframework.beans.BeanUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
+import org.springframework.security.authentication.AuthenticationManager;
+import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
+import org.springframework.security.core.Authentication;
+import org.springframework.security.core.context.SecurityContext;
+import org.springframework.security.core.context.SecurityContextHolder;
+import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
@@ -22,6 +29,9 @@ public class UserController {
     @Autowired
     UserService userService;
 
+    @Autowired
+    AuthenticationManager authenticationManager;
+
     @PostMapping
     @ResponseStatus(HttpStatus.CREATED)
     public User register(@RequestBody @Valid CreateUserDTO createUserDTO) {
@@ -29,5 +39,14 @@ public class UserController {
         BeanUtils.copyProperties(createUserDTO, user);
 
         return userService.createUser(user);
+    }
+
+    @PostMapping("/login")
+    public User login(@RequestBody LoginDTO loginDTO) {
+        UsernamePasswordAuthenticationToken token = UsernamePasswordAuthenticationToken.unauthenticated(loginDTO.getUsername(), loginDTO.getPassword());
+        final var authentication = authenticationManager.authenticate(token);
+        SecurityContextHolder.getContext().setAuthentication(authentication);
+        final var userDetails = (UserDetails) authentication.getPrincipal();
+        return userService.getUserByUsername(userDetails.getUsername());
     }
 }

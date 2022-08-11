@@ -12,7 +12,6 @@ import org.springframework.boot.test.json.JacksonTester;
 import org.springframework.boot.test.mock.mockito.MockBean;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
-import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.test.web.servlet.MockMvc;
 
 import static org.assertj.core.api.Assertions.assertThat;
@@ -27,8 +26,6 @@ public class UserControllerTest {
 
     @MockBean
     UserService userService;
-    @MockBean
-    AuthenticationManager manager;
     @Autowired
     private MockMvc mockMvc;
     @Autowired

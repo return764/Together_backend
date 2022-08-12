@@ -34,7 +34,7 @@ public class UserController {
     }
 
     @PostMapping("/login")
-    public User login(@RequestBody LoginDTO loginDTO) {
+    public User login(@RequestBody @Valid LoginDTO loginDTO) {
         UsernamePasswordAuthenticationToken token
                 = UsernamePasswordAuthenticationToken.unauthenticated(loginDTO.getUsername(), loginDTO.getPassword());
         return userService.login(token);

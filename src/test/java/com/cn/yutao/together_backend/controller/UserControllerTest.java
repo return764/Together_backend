@@ -3,6 +3,7 @@ package com.cn.yutao.together_backend.controller;
 import com.cn.yutao.together_backend.entity.User;
 import com.cn.yutao.together_backend.entity.dto.LoginDTO;
 import com.cn.yutao.together_backend.service.UserService;
+import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import org.junit.jupiter.api.Nested;
 import org.junit.jupiter.api.Test;
@@ -18,10 +19,13 @@ import org.springframework.security.authentication.UsernamePasswordAuthenticatio
 import org.springframework.test.web.servlet.MockMvc;
 
 import static org.assertj.core.api.Assertions.assertThat;
+import static org.mockito.ArgumentMatchers.any;
+import static org.mockito.Mockito.never;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.content;
+import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.jsonPath;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 
 @WebMvcTest(UserController.class)
@@ -83,6 +87,27 @@ public class UserControllerTest {
                     ).andExpect(status().isOk())
                     .andExpect(content().contentType(MediaType.APPLICATION_JSON))
                     .andExpect(content().string(userJson.write(user).getJson()));
+        }
+
+        @Test
+        void should_login_failed_when_input_no_password_params() throws Exception {
+            // given
+            final var pwd = "";
+            final var uname = "testUsername";
+            LoginDTO loginDTO = new LoginDTO();
+            loginDTO.setUsername(uname);
+            loginDTO.setPassword(pwd);
+            User user = new User();
+            when(userService.login(any())).thenReturn(user);
+            // when
+            // then
+            mockMvc.perform(post("/users/login")
+                            .contentType(MediaType.APPLICATION_JSON)
+                            .content(om.writeValueAsString(loginDTO))
+            ).andExpect(status().isBadRequest())
+                    .andExpect(content().contentType(MediaType.APPLICATION_JSON))
+                    .andExpect(jsonPath("$.message").value("password must be not blank"));
+            verify(userService, never()).login(any());
         }
     }
 }

@@ -110,6 +110,16 @@ class TogetherBackendApplicationTests {
             final var user = responseEntity.getBody();
             assertThat(user).isNotNull();
         }
+
+        @Test
+        void should_login_failed() {
+            LoginDTO loginDTO = new LoginDTO();
+            loginDTO.setUsername(userInDatabase.getUsername());
+            loginDTO.setPassword("failedPassword");
+            final var responseEntity = restTemplate.postForEntity("/users/login", loginDTO, ErrorResult.class);
+
+            assertThat(responseEntity.getStatusCode()).isEqualTo(HttpStatus.UNAUTHORIZED);
+        }
     }
 
 

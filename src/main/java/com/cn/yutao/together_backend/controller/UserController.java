@@ -9,6 +9,7 @@ import org.springframework.beans.BeanUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
+import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
@@ -38,6 +39,13 @@ public class UserController {
         UsernamePasswordAuthenticationToken token
                 = UsernamePasswordAuthenticationToken.unauthenticated(loginDTO.getUsername(), loginDTO.getPassword());
         return userService.login(token);
+    }
+
+    @PostMapping("/{id}/binding/{identifyCode}")
+    public User binding(@PathVariable Long id, @PathVariable String identifyCode) {
+        User user = userService.fetchByIdentifyCode(identifyCode);
+        userService.bind(user);
+        return userService.fetchById(id);
     }
 
 }

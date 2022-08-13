@@ -1,9 +1,9 @@
 package com.cn.yutao.together_backend.controller;
 
 import com.cn.yutao.together_backend.entity.User;
+import com.cn.yutao.together_backend.entity.dto.CreateUserDTO;
 import com.cn.yutao.together_backend.entity.dto.LoginDTO;
 import com.cn.yutao.together_backend.service.UserService;
-import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import org.junit.jupiter.api.Nested;
 import org.junit.jupiter.api.Test;
@@ -11,7 +11,6 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.json.AutoConfigureJsonTesters;
 import org.springframework.boot.test.autoconfigure.web.servlet.AutoConfigureMockMvc;
 import org.springframework.boot.test.autoconfigure.web.servlet.WebMvcTest;
-import org.springframework.boot.test.json.JacksonTester;
 import org.springframework.boot.test.mock.mockito.MockBean;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
@@ -38,8 +37,6 @@ public class UserControllerTest {
     @Autowired
     private MockMvc mockMvc;
     @Autowired
-    private JacksonTester<User> userJson;
-    @Autowired
     private ObjectMapper om;
 
 
@@ -52,11 +49,16 @@ public class UserControllerTest {
                     .password("testPassword")
                     .nickname("testName")
                     .build();
+            final var createUserDTO = CreateUserDTO.builder()
+                    .username("testUser")
+                    .password("testPassword")
+                    .nickname("testName")
+                    .build();
             when(userService.createUser(createdUser)).thenReturn(createdUser);
 
             final var response = mockMvc.perform(post("/users")
                             .contentType(MediaType.APPLICATION_JSON)
-                            .content(userJson.write(createdUser).getJson())
+                            .content(om.writeValueAsString(createUserDTO))
                     )
                     .andReturn()
                     .getResponse();
@@ -86,7 +88,7 @@ public class UserControllerTest {
                             .content(om.writeValueAsString(loginDTO))
                     ).andExpect(status().isOk())
                     .andExpect(content().contentType(MediaType.APPLICATION_JSON))
-                    .andExpect(content().string(userJson.write(user).getJson()));
+                    .andExpect(content().string(om.writeValueAsString(user)));
         }
 
         @Test
@@ -104,7 +106,7 @@ public class UserControllerTest {
             mockMvc.perform(post("/users/login")
                             .contentType(MediaType.APPLICATION_JSON)
                             .content(om.writeValueAsString(loginDTO))
-            ).andExpect(status().isBadRequest())
+                    ).andExpect(status().isBadRequest())
                     .andExpect(content().contentType(MediaType.APPLICATION_JSON))
                     .andExpect(jsonPath("$.message").value("password must be not blank"));
             verify(userService, never()).login(any());

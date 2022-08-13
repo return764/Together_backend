@@ -10,6 +10,7 @@ import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Nested;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.TestInstance;
+import org.springframework.beans.BeanUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.boot.test.web.client.TestRestTemplate;
@@ -30,6 +31,8 @@ class TogetherBackendApplicationTests {
     @Autowired
     UserService userService;
     private User userInDatabase;
+    private User userInDatabase2;
+    private User userInDatabase2WithoutPassword;
     private String originPassword;
 
     @BeforeAll
@@ -40,7 +43,16 @@ class TogetherBackendApplicationTests {
                 .password(originPassword)
                 .nickname("testNickname")
                 .build();
+        userInDatabase2 = User.builder()
+                .username("testUsername2")
+                .password(originPassword)
+                .nickname("testNickname2")
+                .build();
         userService.createUser(userInDatabase);
+        userService.createUser(userInDatabase2);
+        userInDatabase2WithoutPassword = new User();
+        BeanUtils.copyProperties(userInDatabase2, userInDatabase2WithoutPassword);
+        userInDatabase2WithoutPassword.setPassword(null);
     }
 
 
@@ -119,6 +131,31 @@ class TogetherBackendApplicationTests {
             final var responseEntity = restTemplate.postForEntity("/users/login", loginDTO, ErrorResult.class);
 
             assertThat(responseEntity.getStatusCode()).isEqualTo(HttpStatus.UNAUTHORIZED);
+        }
+
+        @Test
+        void should_bind_user_successfully() {
+            // given
+            User result = User.builder()
+                    .nickname(userInDatabase.getNickname())
+                    .username(userInDatabase.getUsername())
+                    .identifyCode(userInDatabase.getIdentifyCode())
+                    .id(userInDatabase.getId())
+                    .point(userInDatabase.getPoint())
+                    .binding(userInDatabase2WithoutPassword)
+                    .build();
+
+            // when
+            final var responseEntity = restTemplate
+                    .withBasicAuth(userInDatabase.getUsername(), originPassword)
+                    .postForEntity("/users/{id}/binding/{identifyCode}",
+                    null,
+                    User.class,
+                    userInDatabase.getId(),
+                    userInDatabase2.getIdentifyCode());
+
+            assertThat(responseEntity.getStatusCode()).isEqualTo(HttpStatus.OK);
+            assertThat(responseEntity.getBody()).isEqualTo(result);
         }
     }
 

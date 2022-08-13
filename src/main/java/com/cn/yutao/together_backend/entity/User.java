@@ -1,5 +1,8 @@
 package com.cn.yutao.together_backend.entity;
 
+import com.fasterxml.jackson.annotation.JsonBackReference;
+import com.fasterxml.jackson.annotation.JsonIgnore;
+import com.fasterxml.jackson.annotation.JsonIncludeProperties;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;
@@ -12,6 +15,8 @@ import javax.persistence.GeneratedValue;
 import javax.persistence.GenerationType;
 import javax.persistence.Id;
 import javax.persistence.Index;
+import javax.persistence.JoinColumn;
+import javax.persistence.OneToOne;
 import javax.persistence.PrePersist;
 import javax.persistence.Table;
 import java.util.Objects;
@@ -30,10 +35,25 @@ public class User {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
     private String username;
+    @JsonIgnore
     private String password;
     private String nickname;
     private Long point;
     private String identifyCode;
+
+    @OneToOne
+    @JoinColumn(name = "binding_user_id")
+    private User binding;
+
+    public User getBinding() {
+        if (Objects.isNull(binding)) {
+            return null;
+        }
+        if (Objects.nonNull(binding.binding)) {
+            binding.binding = null;
+        }
+        return binding;
+    }
 
     @PrePersist
     void preInsert() {

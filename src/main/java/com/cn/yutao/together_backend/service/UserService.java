@@ -8,6 +8,8 @@ import com.cn.yutao.together_backend.utils.SecurityUtils;
 import lombok.AllArgsConstructor;
 import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
+import org.springframework.security.core.Authentication;
+import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
@@ -37,13 +39,30 @@ public class UserService {
         return idCode;
     }
 
-    public User getUserByUsername(String username) {
+    public User fetchByUsername(String username) {
         return userRepository.findByUsername(username).orElseThrow(() -> new UserNotFoundException("User " + username + " not found."));
     }
 
     public User login(UsernamePasswordAuthenticationToken token) {
         final UserDetails userDetails = SecurityUtils.login(token, authenticationManager);
-        return getUserByUsername(userDetails.getUsername());
+        return fetchByUsername(userDetails.getUsername());
     }
 
+    public User fetchByIdentifyCode(String identifyCode) {
+        return userRepository.findByIdentifyCode(identifyCode).orElseThrow(() -> new UserNotFoundException("User not found."));
+    }
+
+    public void bind(User bindUser) {
+        final var authentication = SecurityContextHolder.getContext().getAuthentication();
+        final var userDetails = (UserDetails) authentication.getPrincipal();
+        final var loginUser = fetchByUsername(userDetails.getUsername());
+        loginUser.setBinding(bindUser);
+        bindUser.setBinding(loginUser);
+        userRepository.save(loginUser);
+        userRepository.save(bindUser);
+    }
+
+    public User fetchById(Long id) {
+        return userRepository.findById(id).orElseThrow(() -> new UserNotFoundException("User not found."));
+    }
 }

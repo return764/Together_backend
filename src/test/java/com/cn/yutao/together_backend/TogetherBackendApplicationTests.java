@@ -5,6 +5,7 @@ import com.cn.yutao.together_backend.entity.User;
 import com.cn.yutao.together_backend.entity.dto.CreateUserDTO;
 import com.cn.yutao.together_backend.entity.dto.LoginDTO;
 import com.cn.yutao.together_backend.exception.ErrorResult;
+import com.cn.yutao.together_backend.repository.TaskRepository;
 import com.cn.yutao.together_backend.service.UserService;
 import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.BeforeEach;
@@ -178,7 +179,16 @@ class TogetherBackendApplicationTests {
     }
 
     @Nested
+    @TestInstance(TestInstance.Lifecycle.PER_CLASS)
     class TaskTest {
+
+        @Autowired
+        TaskRepository taskRepository;
+
+        @BeforeAll
+        void setUp() {
+            taskRepository.save(new Task("testname", "testdescription"));
+        }
 
         @Test
         void should_list_tasks() {
@@ -191,8 +201,8 @@ class TogetherBackendApplicationTests {
 
             final var body = responseEntity.getBody();
             assertThat(body).hasSize(1);
-            assertThat(body[0].getName()).isEqualTo("task1");
-            assertThat(body[0].getDescription()).isEqualTo("test");
+            assertThat(body[0].getName()).isEqualTo("testname");
+            assertThat(body[0].getDescription()).isEqualTo("testdescription");
         }
     }
 }

@@ -1,6 +1,8 @@
 package com.cn.yutao.together_backend.controller;
 
 import com.cn.yutao.together_backend.entity.Task;
+import com.cn.yutao.together_backend.service.TaskService;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
@@ -11,8 +13,11 @@ import java.util.List;
 @RequestMapping("/tasks")
 public class TaskController {
 
+    @Autowired
+    private TaskService taskService;
+
     @GetMapping
     public List<Task> list() {
-        return List.of(new Task("task1", "test"));
+        return taskService.fetchTasks();
     }
- }
+}

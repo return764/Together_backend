@@ -157,6 +157,23 @@ class TogetherBackendApplicationTests {
             assertThat(responseEntity.getStatusCode()).isEqualTo(HttpStatus.OK);
             assertThat(responseEntity.getBody()).isEqualTo(result);
         }
+
+        @Test
+        void should_bind_user_failed() {
+            // given
+
+            // when
+            final var responseEntity = restTemplate
+                    .withBasicAuth(userInDatabase.getUsername(), originPassword)
+                    .postForEntity("/users/{id}/binding/{identifyCode}",
+                            null,
+                            ErrorResult.class,
+                            userInDatabase.getId(),
+                            "XXXXXX");
+            // then
+            assertThat(responseEntity.getStatusCode()).isEqualTo(HttpStatus.INTERNAL_SERVER_ERROR);
+            assertThat(responseEntity.getBody().getMessage()).isEqualTo("User not found.");
+        }
     }
 
 

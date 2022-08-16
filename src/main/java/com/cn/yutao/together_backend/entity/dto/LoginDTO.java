@@ -1,7 +1,6 @@
 package com.cn.yutao.together_backend.entity.dto;
 
 import lombok.Data;
-import org.hibernate.validator.constraints.Length;
 
 import javax.validation.constraints.NotBlank;
 

@@ -1,5 +1,6 @@
 package com.cn.yutao.together_backend;
 
+import com.cn.yutao.together_backend.entity.Task;
 import com.cn.yutao.together_backend.entity.User;
 import com.cn.yutao.together_backend.entity.dto.CreateUserDTO;
 import com.cn.yutao.together_backend.entity.dto.LoginDTO;
@@ -176,6 +177,23 @@ class TogetherBackendApplicationTests {
         }
     }
 
+    @Nested
+    class TaskTest {
 
+        @Test
+        void should_list_tasks() {
+            // given
+            // when
+            final var responseEntity = restTemplate.withBasicAuth(userInDatabase.getUsername(), originPassword)
+                    .getForEntity("/tasks", Task[].class);
+            // then
+            assertThat(responseEntity.getStatusCode()).isEqualTo(HttpStatus.OK);
+
+            final var body = responseEntity.getBody();
+            assertThat(body).hasSize(1);
+            assertThat(body[0].getName()).isEqualTo("task1");
+            assertThat(body[0].getDescription()).isEqualTo("test");
+        }
+    }
 }
 

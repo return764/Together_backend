@@ -3,6 +3,8 @@ package com.cn.yutao.together_backend.service;
 import com.cn.yutao.together_backend.entity.User;
 import com.cn.yutao.together_backend.repository.UserRepository;
 import com.cn.yutao.together_backend.utils.IdentifyCodeUtils;
+import com.cn.yutao.together_backend.utils.SecurityUtils;
+import com.fasterxml.jackson.databind.ObjectMapper;
 import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
@@ -10,8 +12,10 @@ import org.junit.jupiter.api.TestInstance;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
+import org.mockito.MockedStatic;
 import org.mockito.Mockito;
 import org.mockito.junit.jupiter.MockitoExtension;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.crypto.password.PasswordEncoder;
 
 import java.util.Optional;
@@ -37,10 +41,12 @@ class UserServiceTest {
     private User secondUserStored;
     private String firstCode;
     private String secondCode;
+    private MockedStatic<SecurityUtils> securityUtils;
 
     @BeforeAll
     void beforeAll() {
         Mockito.mockStatic(IdentifyCodeUtils.class);
+        securityUtils = Mockito.mockStatic(SecurityUtils.class);
         firstCode = "111111";
         secondCode = "222222";
     }
@@ -60,7 +66,7 @@ class UserServiceTest {
         secondUserStored = commonUserBuilder
                 .identifyCode(secondCode)
                 .build();
-        when(passwordEncoder.encode(user.getPassword())).thenReturn(user.getPassword());
+//        when(passwordEncoder.encode(user.getPassword())).thenReturn(user.getPassword());
     }
 
     @Test
@@ -91,5 +97,18 @@ class UserServiceTest {
         verify(repository).findByIdentifyCode(firstCode);
         verify(repository).findByIdentifyCode(secondCode);
         verify(repository, times(1)).save(user);
+    }
+
+    @Test
+    void should_bind_user_together() {
+        // given
+        User loginUser = new User(1L, "", "", "", 0L, "", null);
+        User bindUser = new User(2L, "", "", "", 0L, "", null);
+        when(SecurityUtils.getLoginUser()).thenReturn(loginUser);
+        // when
+        userService.bind(bindUser);
+        // then
+        securityUtils.verify(SecurityUtils::getLoginUser, times(1));
+        assertThat(bindUser.getBinding().getId()).isEqualTo(1L);
     }
 }

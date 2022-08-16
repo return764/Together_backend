@@ -3,7 +3,6 @@ package com.cn.yutao.together_backend.integration.security;
 import com.cn.yutao.together_backend.exception.UserNotFoundException;
 import com.cn.yutao.together_backend.repository.UserRepository;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.security.core.userdetails.User;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.security.core.userdetails.UserDetailsService;
 import org.springframework.security.core.userdetails.UsernameNotFoundException;
@@ -20,10 +19,6 @@ public class AuthUserDetailService implements UserDetailsService {
     public UserDetails loadUserByUsername(String username) throws UsernameNotFoundException {
         final var foundUserOptional = userRepository.findByUsername(username);
         final var user = foundUserOptional.orElseThrow(() -> new UserNotFoundException("User isn't existing"));
-        return User
-                .withUsername(user.getUsername())
-                .password(user.getPassword())
-                .authorities("USER")
-                .build();
+        return new UserAuthentication(user.getUsername(), user.getPassword(), "USER").withLoginUser(user);
     }
 }

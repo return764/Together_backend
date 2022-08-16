@@ -53,12 +53,10 @@ public class UserService {
     }
 
     public void bind(User bindUser) {
-        final var authentication = SecurityContextHolder.getContext().getAuthentication();
-        final var userDetails = (UserDetails) authentication.getPrincipal();
-        final var loginUser = fetchByUsername(userDetails.getUsername());
+        final User loginUser = SecurityUtils.getLoginUser();
         loginUser.setBinding(bindUser);
-        bindUser.setBinding(loginUser);
         userRepository.save(loginUser);
+        bindUser.setBinding(loginUser);
         userRepository.save(bindUser);
     }
 

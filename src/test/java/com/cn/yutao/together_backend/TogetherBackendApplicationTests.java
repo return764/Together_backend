@@ -4,6 +4,7 @@ import com.cn.yutao.together_backend.entity.Task;
 import com.cn.yutao.together_backend.entity.User;
 import com.cn.yutao.together_backend.entity.dto.CreateUserDTO;
 import com.cn.yutao.together_backend.entity.dto.LoginDTO;
+import com.cn.yutao.together_backend.entity.enums.TaskStatus;
 import com.cn.yutao.together_backend.exception.ErrorResult;
 import com.cn.yutao.together_backend.repository.TaskRepository;
 import com.cn.yutao.together_backend.service.UserService;
@@ -203,6 +204,7 @@ class TogetherBackendApplicationTests {
             assertThat(body).hasSize(1);
             assertThat(body[0].getName()).isEqualTo("testname");
             assertThat(body[0].getDescription()).isEqualTo("testdescription");
+            assertThat(body[0].getStatus()).isEqualTo(TaskStatus.UNCOMPLETED.value());
         }
     }
 }

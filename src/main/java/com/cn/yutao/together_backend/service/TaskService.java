@@ -6,6 +6,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
+import java.util.Objects;
 
 @Service
 public class TaskService {
@@ -15,5 +16,12 @@ public class TaskService {
 
     public List<Task> fetchTasks() {
         return taskRepository.findAll();
+    }
+
+    public List<Task> fetchTasks(Integer status) {
+        if (Objects.isNull(status)) {
+            return fetchTasks();
+        }
+        return taskRepository.findAll((root, query, cb) -> cb.equal(root.get("status"), status));
     }
 }

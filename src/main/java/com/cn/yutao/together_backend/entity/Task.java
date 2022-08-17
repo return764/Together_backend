@@ -23,6 +23,12 @@ public class Task {
         this.description = description;
     }
 
+    public Task(String name, String description, Integer status) {
+        this.name = name;
+        this.description = description;
+        this.status = status;
+    }
+
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;

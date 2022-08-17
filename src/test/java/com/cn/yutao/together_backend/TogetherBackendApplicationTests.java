@@ -20,6 +20,7 @@ import org.springframework.boot.test.web.client.TestRestTemplate;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
 
+import java.util.HashMap;
 import java.util.Objects;
 
 import static org.assertj.core.api.Assertions.assertThat;
@@ -188,7 +189,9 @@ class TogetherBackendApplicationTests {
 
         @BeforeAll
         void setUp() {
-            taskRepository.save(new Task("testname", "testdescription"));
+            taskRepository.save(new Task("testname", "testdescription", 0));
+            taskRepository.save(new Task("testname", "testdescription", 1));
+            taskRepository.save(new Task("testname", "testdescription", 2));
         }
 
         @Test
@@ -201,10 +204,22 @@ class TogetherBackendApplicationTests {
             assertThat(responseEntity.getStatusCode()).isEqualTo(HttpStatus.OK);
 
             final var body = responseEntity.getBody();
-            assertThat(body).hasSize(1);
-            assertThat(body[0].getName()).isEqualTo("testname");
-            assertThat(body[0].getDescription()).isEqualTo("testdescription");
-            assertThat(body[0].getStatus()).isEqualTo(TaskStatus.UNCOMPLETED.value());
+            assertThat(body).hasSize(3);
+        }
+
+        @Test
+        void should_list_tasks_with_status_filter() {
+            // given
+            // when
+            final var map = new HashMap<String, String>();
+            map.put("status", "1");
+            final var responseEntity = restTemplate.withBasicAuth(userInDatabase.getUsername(), originPassword)
+                    .getForEntity("/tasks?status={status}", Task[].class, map);
+            // then
+            assertThat(responseEntity.getStatusCode()).isEqualTo(HttpStatus.OK);
+            final var result = responseEntity.getBody();
+            assertThat(result).hasSize(1);
+            assertThat(result[0].getStatus()).isEqualTo(1);
         }
     }
 }

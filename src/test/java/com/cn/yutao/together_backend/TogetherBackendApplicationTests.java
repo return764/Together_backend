@@ -224,11 +224,12 @@ class TogetherBackendApplicationTests {
         }
 
         @Test
-        void should_create_task_when_given_name_and_desc() {
+        void should_create_task_when_given_name_and_desc_and_target() {
             // given
             CreateTaskDTO createTaskDTO = new CreateTaskDTO();
             createTaskDTO.setName("test");
             createTaskDTO.setDescription("test");
+            createTaskDTO.setTargetId(userInDatabase2.getId());
             // when
             final var responseEntity = restTemplate.withBasicAuth(userInDatabase.getUsername(), originPassword)
                     .postForEntity("/tasks", createTaskDTO, Task.class);
@@ -237,6 +238,8 @@ class TogetherBackendApplicationTests {
             assertThat(savedTask.getName()).isEqualTo(createTaskDTO.getName());
             assertThat(savedTask.getDescription()).isEqualTo(createTaskDTO.getDescription());
             assertThat(savedTask.getStatus()).isEqualTo(TaskStatus.UNCOMPLETED.value());
+            assertThat(savedTask.getSourceUser().getId()).isEqualTo(userInDatabase.getId());
+            assertThat(savedTask.getTargetUser().getId()).isEqualTo(userInDatabase2.getId());
         }
     }
 }

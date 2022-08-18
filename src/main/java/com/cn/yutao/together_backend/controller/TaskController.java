@@ -1,8 +1,11 @@
 package com.cn.yutao.together_backend.controller;
 
 import com.cn.yutao.together_backend.entity.Task;
+import com.cn.yutao.together_backend.entity.User;
 import com.cn.yutao.together_backend.entity.dto.CreateTaskDTO;
 import com.cn.yutao.together_backend.service.TaskService;
+import com.cn.yutao.together_backend.service.UserService;
+import com.cn.yutao.together_backend.utils.SecurityUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PostMapping;
@@ -19,6 +22,8 @@ public class TaskController {
 
     @Autowired
     private TaskService taskService;
+    @Autowired
+    private UserService userService;
 
     @GetMapping
     public List<Task> list(@RequestParam(required = false) Integer status) {
@@ -30,6 +35,8 @@ public class TaskController {
         Task task = new Task();
         task.setName(createTaskDTO.getName());
         task.setDescription(createTaskDTO.getDescription());
+        task.setSourceUser(SecurityUtils.getLoginUser());
+        task.setTargetUser(userService.fetchById(createTaskDTO.getTargetId()));
         return taskService.create(task);
     }
 }

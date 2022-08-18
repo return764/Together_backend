@@ -24,4 +24,9 @@ public class TaskService {
         }
         return taskRepository.findAll((root, query, cb) -> cb.equal(root.get("status"), status));
     }
+
+    public Task create(Task task) {
+        taskRepository.save(task);
+        return task;
+    }
 }

@@ -2,6 +2,7 @@ package com.cn.yutao.together_backend;
 
 import com.cn.yutao.together_backend.entity.Task;
 import com.cn.yutao.together_backend.entity.User;
+import com.cn.yutao.together_backend.entity.dto.CreateTaskDTO;
 import com.cn.yutao.together_backend.entity.dto.CreateUserDTO;
 import com.cn.yutao.together_backend.entity.dto.LoginDTO;
 import com.cn.yutao.together_backend.entity.enums.TaskStatus;
@@ -220,6 +221,22 @@ class TogetherBackendApplicationTests {
             final var result = responseEntity.getBody();
             assertThat(result).hasSize(1);
             assertThat(result[0].getStatus()).isEqualTo(1);
+        }
+
+        @Test
+        void should_create_task_when_given_name_and_desc() {
+            // given
+            CreateTaskDTO createTaskDTO = new CreateTaskDTO();
+            createTaskDTO.setName("test");
+            createTaskDTO.setDescription("test");
+            // when
+            final var responseEntity = restTemplate.withBasicAuth(userInDatabase.getUsername(), originPassword)
+                    .postForEntity("/tasks", createTaskDTO, Task.class);
+            // then
+            final var savedTask = responseEntity.getBody();
+            assertThat(savedTask.getName()).isEqualTo(createTaskDTO.getName());
+            assertThat(savedTask.getDescription()).isEqualTo(createTaskDTO.getDescription());
+            assertThat(savedTask.getStatus()).isEqualTo(TaskStatus.UNCOMPLETED.value());
         }
     }
 }

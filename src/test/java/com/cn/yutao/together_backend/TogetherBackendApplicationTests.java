@@ -7,17 +7,10 @@ import com.cn.yutao.together_backend.entity.dto.CreateUserDTO;
 import com.cn.yutao.together_backend.entity.dto.LoginDTO;
 import com.cn.yutao.together_backend.entity.enums.TaskStatus;
 import com.cn.yutao.together_backend.exception.ErrorResult;
-import com.cn.yutao.together_backend.repository.TaskRepository;
-import com.cn.yutao.together_backend.service.UserService;
-import org.junit.jupiter.api.BeforeAll;
+import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Nested;
 import org.junit.jupiter.api.Test;
-import org.junit.jupiter.api.TestInstance;
-import org.springframework.beans.BeanUtils;
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.boot.test.context.SpringBootTest;
-import org.springframework.boot.test.web.client.TestRestTemplate;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
 
@@ -26,39 +19,8 @@ import java.util.Objects;
 
 import static org.assertj.core.api.Assertions.assertThat;
 
-@TestInstance(TestInstance.Lifecycle.PER_CLASS)
-@SpringBootTest(webEnvironment = SpringBootTest.WebEnvironment.RANDOM_PORT)
-class TogetherBackendApplicationTests {
 
-    @Autowired
-    TestRestTemplate restTemplate;
-
-    @Autowired
-    UserService userService;
-    private User userInDatabase;
-    private User userInDatabase2;
-    private User userInDatabase2WithoutPassword;
-    private String originPassword;
-
-    @BeforeAll
-    void setUp() {
-        originPassword = "testPassword";
-        userInDatabase = User.builder()
-                .username("testUsername")
-                .password(originPassword)
-                .nickname("testNickname")
-                .build();
-        userInDatabase2 = User.builder()
-                .username("testUsername2")
-                .password(originPassword)
-                .nickname("testNickname2")
-                .build();
-        userService.createUser(userInDatabase);
-        userService.createUser(userInDatabase2);
-        userInDatabase2WithoutPassword = new User();
-        BeanUtils.copyProperties(userInDatabase2, userInDatabase2WithoutPassword);
-        userInDatabase2WithoutPassword.setPassword(null);
-    }
+class TogetherBackendApplicationTests extends BasicSpringBootTest {
 
 
     @Nested
@@ -66,8 +28,7 @@ class TogetherBackendApplicationTests {
         @Test
         void should_hello_world() {
             final var responseEntity =
-                    restTemplate
-                            .withBasicAuth(userInDatabase.getUsername(), originPassword)
+                    restTemplateWithLogin
                             .getForEntity("/hello", String.class);
 
             assertThat(responseEntity.getBody()).isEqualTo("World");
@@ -120,7 +81,7 @@ class TogetherBackendApplicationTests {
         void should_login_successfully() {
             LoginDTO loginDTO = new LoginDTO();
             loginDTO.setUsername(userInDatabase.getUsername());
-            loginDTO.setPassword(originPassword);
+            loginDTO.setPassword(originPwd);
             final var responseEntity = restTemplate.postForEntity("/users/login", loginDTO, User.class);
 
             assertThat(responseEntity.getStatusCode()).isEqualTo(HttpStatus.OK);
@@ -151,13 +112,12 @@ class TogetherBackendApplicationTests {
                     .build();
 
             // when
-            final var responseEntity = restTemplate
-                    .withBasicAuth(userInDatabase.getUsername(), originPassword)
+            final var responseEntity = restTemplateWithLogin
                     .postForEntity("/users/{id}/binding/{identifyCode}",
-                    null,
-                    User.class,
-                    userInDatabase.getId(),
-                    userInDatabase2.getIdentifyCode());
+                            null,
+                            User.class,
+                            userInDatabase.getId(),
+                            userInDatabase2.getIdentifyCode());
 
             assertThat(responseEntity.getStatusCode()).isEqualTo(HttpStatus.OK);
             assertThat(responseEntity.getBody()).isEqualTo(result);
@@ -168,8 +128,7 @@ class TogetherBackendApplicationTests {
             // given
 
             // when
-            final var responseEntity = restTemplate
-                    .withBasicAuth(userInDatabase.getUsername(), originPassword)
+            final var responseEntity = restTemplateWithLogin
                     .postForEntity("/users/{id}/binding/{identifyCode}",
                             null,
                             ErrorResult.class,
@@ -182,24 +141,25 @@ class TogetherBackendApplicationTests {
     }
 
     @Nested
-    @TestInstance(TestInstance.Lifecycle.PER_CLASS)
     class TaskTest {
 
-        @Autowired
-        TaskRepository taskRepository;
-
-        @BeforeAll
+        @BeforeEach
         void setUp() {
             taskRepository.save(new Task("testname", "testdescription", 0));
             taskRepository.save(new Task("testname", "testdescription", 1));
             taskRepository.save(new Task("testname", "testdescription", 2));
         }
 
+        @AfterEach
+        void tearDown() {
+            taskRepository.deleteAll();
+        }
+
         @Test
         void should_list_tasks() {
             // given
             // when
-            final var responseEntity = restTemplate.withBasicAuth(userInDatabase.getUsername(), originPassword)
+            final var responseEntity = restTemplateWithLogin
                     .getForEntity("/tasks", Task[].class);
             // then
             assertThat(responseEntity.getStatusCode()).isEqualTo(HttpStatus.OK);
@@ -214,7 +174,7 @@ class TogetherBackendApplicationTests {
             // when
             final var map = new HashMap<String, String>();
             map.put("status", "1");
-            final var responseEntity = restTemplate.withBasicAuth(userInDatabase.getUsername(), originPassword)
+            final var responseEntity = restTemplateWithLogin
                     .getForEntity("/tasks?status={status}", Task[].class, map);
             // then
             assertThat(responseEntity.getStatusCode()).isEqualTo(HttpStatus.OK);
@@ -231,7 +191,7 @@ class TogetherBackendApplicationTests {
             createTaskDTO.setDescription("test");
             createTaskDTO.setTargetId(userInDatabase2.getId());
             // when
-            final var responseEntity = restTemplate.withBasicAuth(userInDatabase.getUsername(), originPassword)
+            final var responseEntity = restTemplateWithLogin
                     .postForEntity("/tasks", createTaskDTO, Task.class);
             // then
             final var savedTask = responseEntity.getBody();

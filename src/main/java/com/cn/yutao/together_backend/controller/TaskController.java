@@ -2,6 +2,7 @@ package com.cn.yutao.together_backend.controller;
 
 import com.cn.yutao.together_backend.entity.Task;
 import com.cn.yutao.together_backend.entity.dto.CreateTaskDTO;
+import com.cn.yutao.together_backend.entity.dto.QueryTaskDTO;
 import com.cn.yutao.together_backend.service.TaskService;
 import com.cn.yutao.together_backend.service.UserService;
 import com.cn.yutao.together_backend.utils.SecurityUtils;
@@ -10,7 +11,6 @@ import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
 import java.util.List;
@@ -25,9 +25,11 @@ public class TaskController {
     private UserService userService;
 
     @GetMapping
-    public List<Task> list(@RequestParam(required = false) Integer status,
-                           @RequestParam Long sourceUserId) {
-        return taskService.fetchTasks(status, sourceUserId);
+    public List<Task> list(QueryTaskDTO queryTaskDTO) {
+        Task task = new Task();
+        task.setStatus(queryTaskDTO.getStatus());
+        task.setSourceUser(userService.fetchById(queryTaskDTO.getSourceUserId()));
+        return taskService.fetchTasks(task);
     }
 
     @PostMapping

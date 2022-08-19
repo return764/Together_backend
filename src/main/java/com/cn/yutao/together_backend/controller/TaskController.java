@@ -25,8 +25,9 @@ public class TaskController {
     private UserService userService;
 
     @GetMapping
-    public List<Task> list(@RequestParam(required = false) Integer status) {
-        return taskService.fetchTasks(status);
+    public List<Task> list(@RequestParam(required = false) Integer status,
+                           @RequestParam Long sourceUserId) {
+        return taskService.fetchTasks(status, sourceUserId);
     }
 
     @PostMapping

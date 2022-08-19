@@ -30,6 +30,15 @@ public class Task {
         this.status = status;
     }
 
+    public Task(String name, String description, Integer status, User sourceUser, User targetUser, LocalDateTime deadline) {
+        this.name = name;
+        this.description = description;
+        this.status = status;
+        this.sourceUser = sourceUser;
+        this.targetUser = targetUser;
+        this.deadline = deadline;
+    }
+
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;

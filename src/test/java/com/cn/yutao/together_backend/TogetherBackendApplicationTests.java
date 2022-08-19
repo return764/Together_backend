@@ -164,9 +164,10 @@ class TogetherBackendApplicationTests extends BasicSpringBootTest {
 
         @BeforeEach
         void setUp() {
-            taskRepository.save(new Task("testname", "testdescription", 0));
-            taskRepository.save(new Task("testname", "testdescription", 1));
-            taskRepository.save(new Task("testname", "testdescription", 2));
+            taskRepository.save(new Task("testname", "testdescription", 0, userInDatabase, userInDatabase2, LocalDateTime.now().plusDays(1)));
+            taskRepository.save(new Task("testname", "testdescription", 1, userInDatabase, userInDatabase2, LocalDateTime.now().plusDays(1)));
+            taskRepository.save(new Task("testname", "testdescription", 2, userInDatabase, userInDatabase2, LocalDateTime.now().plusDays(1)));
+            taskRepository.save(new Task("testname", "testdescription", 0, userInDatabase2, userInDatabase, LocalDateTime.now().plusDays(1)));
         }
 
         @AfterEach
@@ -175,11 +176,13 @@ class TogetherBackendApplicationTests extends BasicSpringBootTest {
         }
 
         @Test
-        void should_list_tasks() {
+        void should_list_tasks_with_source_user_filter() {
             // given
+            final var map = new HashMap<String, String>();
+            map.put("sourceUserId", userInDatabase.getId().toString());
             // when
             final var responseEntity = restTemplateWithLogin
-                    .getForEntity("/tasks", Task[].class);
+                    .getForEntity("/tasks?sourceUserId={sourceUserId}", Task[].class, map);
             // then
             assertThat(responseEntity.getStatusCode()).isEqualTo(HttpStatus.OK);
 
@@ -193,8 +196,9 @@ class TogetherBackendApplicationTests extends BasicSpringBootTest {
             // when
             final var map = new HashMap<String, String>();
             map.put("status", "1");
+            map.put("sourceUserId", userInDatabase.getId().toString());
             final var responseEntity = restTemplateWithLogin
-                    .getForEntity("/tasks?status={status}", Task[].class, map);
+                    .getForEntity("/tasks?status={status}&sourceUserId={sourceUserId}", Task[].class, map);
             // then
             assertThat(responseEntity.getStatusCode()).isEqualTo(HttpStatus.OK);
             final var result = responseEntity.getBody();

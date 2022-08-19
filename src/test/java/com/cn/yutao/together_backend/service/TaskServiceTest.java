@@ -34,26 +34,26 @@ class TaskServiceTest {
                 new Task("test", "test", 2));
     }
 
-    @Test
-    void should_return_all_tasks_when_given_null_status() {
-        // given
-        when(repository.findAll()).thenReturn(tasks);
-        // when
-        final var result = taskService.fetchTasks(null);
-        // then
-        assertThat(result).hasSize(3).isEqualTo(tasks);
-        verify(repository, times(1)).findAll();
-    }
-
-    @Test
-    void should_return_tasks_filter_by_status() {
-        // given
-        when(repository.findAll(any(Specification.class)))
-                .thenReturn(List.of(tasks.get(1)));
-        // when
-        final var result = taskService.fetchTasks(1);
-        // then
-        assertThat(result).hasSize(1).isEqualTo(List.of(tasks.get(1)));
-        verify(repository, times(1)).findAll(any(Specification.class));
-    }
+//    @Test
+//    void should_return_all_tasks_when_given_null_status() {
+//        // given
+//        when(repository.findAll()).thenReturn(tasks);
+//        // when
+//        final var result = taskService.fetchTasks(null);
+//        // then
+//        assertThat(result).hasSize(3).isEqualTo(tasks);
+//        verify(repository, times(1)).findAll();
+//    }
+//
+//    @Test
+//    void should_return_tasks_filter_by_status() {
+//        // given
+//        when(repository.findAll(any(Specification.class)))
+//                .thenReturn(List.of(tasks.get(1)));
+//        // when
+//        final var result = taskService.fetchTasks(1);
+//        // then
+//        assertThat(result).hasSize(1).isEqualTo(List.of(tasks.get(1)));
+//        verify(repository, times(1)).findAll(any(Specification.class));
+//    }
 }

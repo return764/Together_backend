@@ -10,8 +10,8 @@ import javax.persistence.GenerationType;
 import javax.persistence.Id;
 import javax.persistence.JoinColumn;
 import javax.persistence.ManyToOne;
-import javax.persistence.OneToOne;
 import javax.persistence.PrePersist;
+import java.time.LocalDateTime;
 import java.util.Objects;
 
 @Data
@@ -45,10 +45,16 @@ public class Task {
     @JoinColumn(name = "target_user_id")
     private User targetUser;
 
+    private LocalDateTime deadline;
+    private LocalDateTime createAt;
+
     @PrePersist
     void prePersist() {
         if (Objects.isNull(status)) {
             status = TaskStatus.UNCOMPLETED.value();
+        }
+        if (Objects.isNull(createAt)) {
+            createAt = LocalDateTime.now();
         }
     }
 }

@@ -1,7 +1,6 @@
 package com.cn.yutao.together_backend.controller;
 
 import com.cn.yutao.together_backend.entity.Task;
-import com.cn.yutao.together_backend.entity.User;
 import com.cn.yutao.together_backend.entity.dto.CreateTaskDTO;
 import com.cn.yutao.together_backend.service.TaskService;
 import com.cn.yutao.together_backend.service.UserService;
@@ -37,6 +36,7 @@ public class TaskController {
         task.setDescription(createTaskDTO.getDescription());
         task.setSourceUser(SecurityUtils.getLoginUser());
         task.setTargetUser(userService.fetchById(createTaskDTO.getTargetId()));
+        task.setDeadline(createTaskDTO.getDeadline());
         return taskService.create(task);
     }
 }

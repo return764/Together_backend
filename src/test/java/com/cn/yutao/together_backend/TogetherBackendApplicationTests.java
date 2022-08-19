@@ -7,6 +7,7 @@ import com.cn.yutao.together_backend.entity.dto.CreateUserDTO;
 import com.cn.yutao.together_backend.entity.dto.LoginDTO;
 import com.cn.yutao.together_backend.entity.enums.TaskStatus;
 import com.cn.yutao.together_backend.exception.ErrorResult;
+import org.assertj.core.data.TemporalOffset;
 import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Nested;
@@ -14,10 +15,13 @@ import org.junit.jupiter.api.Test;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
 
+import java.time.LocalDateTime;
+import java.time.temporal.ChronoUnit;
 import java.util.HashMap;
 import java.util.Objects;
 
 import static org.assertj.core.api.Assertions.assertThat;
+import static org.assertj.core.api.Assertions.within;
 
 
 class TogetherBackendApplicationTests extends BasicSpringBootTest {
@@ -186,10 +190,12 @@ class TogetherBackendApplicationTests extends BasicSpringBootTest {
         @Test
         void should_create_task_when_given_name_and_desc_and_target() {
             // given
+            final var now = LocalDateTime.now();
             CreateTaskDTO createTaskDTO = new CreateTaskDTO();
             createTaskDTO.setName("test");
             createTaskDTO.setDescription("test");
             createTaskDTO.setTargetId(userInDatabase2.getId());
+            createTaskDTO.setDeadline(now.plusDays(1));
             // when
             final var responseEntity = restTemplateWithLogin
                     .postForEntity("/tasks", createTaskDTO, Task.class);
@@ -200,6 +206,8 @@ class TogetherBackendApplicationTests extends BasicSpringBootTest {
             assertThat(savedTask.getStatus()).isEqualTo(TaskStatus.UNCOMPLETED.value());
             assertThat(savedTask.getSourceUser().getId()).isEqualTo(userInDatabase.getId());
             assertThat(savedTask.getTargetUser().getId()).isEqualTo(userInDatabase2.getId());
+            assertThat(savedTask.getDeadline()).isEqualTo(createTaskDTO.getDeadline());
+            assertThat(savedTask.getCreateAt()).isCloseTo(now, within(1, ChronoUnit.SECONDS));
         }
     }
 }

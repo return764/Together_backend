@@ -142,6 +142,21 @@ class TogetherBackendApplicationTests extends BasicSpringBootTest {
             assertThat(responseEntity.getStatusCode()).isEqualTo(HttpStatus.INTERNAL_SERVER_ERROR);
             assertThat(responseEntity.getBody().getMessage()).isEqualTo("User not found.");
         }
+
+        @Test
+        void should_bind_failed_when_bind_self() {
+            // given
+            // when
+            final var responseEntity = restTemplateWithLogin
+                    .postForEntity("/users/{id}/binding/{identifyCode}",
+                            null,
+                            ErrorResult.class,
+                            userInDatabase.getId(),
+                            userInDatabase.getIdentifyCode());
+            // then
+            assertThat(responseEntity.getStatusCode()).isEqualTo(HttpStatus.BAD_REQUEST);
+            assertThat(responseEntity.getBody().getMessage()).contains("Bind user failed");
+        }
     }
 
     @Nested

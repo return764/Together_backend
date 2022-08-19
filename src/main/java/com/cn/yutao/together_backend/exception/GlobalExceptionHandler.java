@@ -27,6 +27,12 @@ public class GlobalExceptionHandler {
         return new ErrorResult(errMessage);
     }
 
+    @ExceptionHandler(BindUserException.class)
+    @ResponseStatus(HttpStatus.BAD_REQUEST)
+    public ErrorResult handleBindUserException(BindUserException e) {
+        return new ErrorResult(e.getMessage());
+    }
+
     @ResponseStatus(HttpStatus.UNAUTHORIZED)
     @ExceptionHandler(BadCredentialsException.class)
     public ErrorResult handleBadCredentialsException(BadCredentialsException e) {

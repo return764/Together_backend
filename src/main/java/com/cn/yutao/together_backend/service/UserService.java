@@ -1,6 +1,7 @@
 package com.cn.yutao.together_backend.service;
 
 import com.cn.yutao.together_backend.entity.User;
+import com.cn.yutao.together_backend.exception.BindUserException;
 import com.cn.yutao.together_backend.exception.UserNotFoundException;
 import com.cn.yutao.together_backend.repository.UserRepository;
 import com.cn.yutao.together_backend.utils.IdentifyCodeUtils;
@@ -11,6 +12,8 @@ import org.springframework.security.authentication.UsernamePasswordAuthenticatio
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
+
+import java.util.Objects;
 
 @Service
 @AllArgsConstructor
@@ -52,6 +55,9 @@ public class UserService {
 
     public void bind(User bindUser) {
         final User loginUser = SecurityUtils.getLoginUser();
+        if(Objects.equals(loginUser, bindUser)) {
+            throw new BindUserException("Bind user failed: can't bind user self");
+        }
         loginUser.setBinding(bindUser);
         userRepository.save(loginUser);
         bindUser.setBinding(loginUser);

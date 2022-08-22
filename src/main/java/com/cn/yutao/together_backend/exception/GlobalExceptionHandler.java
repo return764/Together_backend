@@ -39,9 +39,9 @@ public class GlobalExceptionHandler {
         return new ErrorResult(e.getMessage());
     }
 
-    @ExceptionHandler(Exception.class)
+    @ExceptionHandler(RuntimeException.class)
     @ResponseStatus(HttpStatus.INTERNAL_SERVER_ERROR)
-    public ErrorResult handleOtherException(Exception e) {
+    public ErrorResult handleOtherException(RuntimeException e) {
         log.error(e.getMessage());
         return new ErrorResult(e.getMessage());
     }

@@ -1,7 +1,8 @@
 package com.cn.yutao.together_backend.entity.enums;
 
 public enum TaskStatus {
-    UNCOMPLETED(0, "uncompleted");
+    UNCOMPLETED(0, "uncompleted"),
+    TO_EXAMINE(1, "to examine");
 
     private final Integer status;
     private final String name;

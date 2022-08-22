@@ -5,6 +5,7 @@ import com.cn.yutao.together_backend.entity.User;
 import com.cn.yutao.together_backend.entity.dto.CreateTaskDTO;
 import com.cn.yutao.together_backend.entity.dto.CreateUserDTO;
 import com.cn.yutao.together_backend.entity.dto.LoginDTO;
+import com.cn.yutao.together_backend.entity.dto.UpdateTaskDTO;
 import com.cn.yutao.together_backend.entity.enums.TaskStatus;
 import com.cn.yutao.together_backend.exception.ErrorResult;
 import org.assertj.core.data.TemporalOffset;
@@ -12,6 +13,8 @@ import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Nested;
 import org.junit.jupiter.api.Test;
+import org.springframework.http.HttpEntity;
+import org.springframework.http.HttpMethod;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
 
@@ -162,12 +165,15 @@ class TogetherBackendApplicationTests extends BasicSpringBootTest {
     @Nested
     class TaskTest {
 
+        private Task user2Task;
+
         @BeforeEach
         void setUp() {
+            user2Task = new Task("testname", "testdescription", 0, userInDatabase2, userInDatabase, LocalDateTime.now().plusDays(1));
             taskRepository.save(new Task("testname", "testdescription", 0, userInDatabase, userInDatabase2, LocalDateTime.now().plusDays(1)));
             taskRepository.save(new Task("testname", "testdescription", 1, userInDatabase, userInDatabase2, LocalDateTime.now().plusDays(1)));
             taskRepository.save(new Task("testname", "testdescription", 2, userInDatabase, userInDatabase2, LocalDateTime.now().plusDays(1)));
-            taskRepository.save(new Task("testname", "testdescription", 0, userInDatabase2, userInDatabase, LocalDateTime.now().plusDays(1)));
+            taskRepository.save(user2Task);
         }
 
         @AfterEach
@@ -227,6 +233,24 @@ class TogetherBackendApplicationTests extends BasicSpringBootTest {
             assertThat(savedTask.getTargetUser().getId()).isEqualTo(userInDatabase2.getId());
             assertThat(savedTask.getDeadline()).isEqualTo(createTaskDTO.getDeadline());
             assertThat(savedTask.getCreateAt()).isCloseTo(now, within(1, ChronoUnit.SECONDS));
+        }
+
+        @Test
+        void should_change_task_state_to_1_when_complete_task() {
+            // given
+            UpdateTaskDTO task = new UpdateTaskDTO();
+            task.setStatus(TaskStatus.TO_EXAMINE.value());
+            // when
+            final var response = restTemplateWithLogin.exchange(
+                    "/tasks/{id}",
+                    HttpMethod.PUT,
+                    new HttpEntity<>(task),
+                    Task.class,
+                    user2Task.getId()
+            );
+            // then
+            assertThat(response.getStatusCode()).isEqualTo(HttpStatus.OK);
+            assertThat(response.getBody().getStatus()).isEqualTo(TaskStatus.TO_EXAMINE.value());
         }
     }
 }

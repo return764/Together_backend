@@ -6,9 +6,7 @@ import com.cn.yutao.together_backend.entity.dto.CreateTaskDTO;
 import com.cn.yutao.together_backend.service.TaskService;
 import com.cn.yutao.together_backend.service.UserService;
 import com.fasterxml.jackson.databind.ObjectMapper;
-import org.junit.jupiter.api.Test;
 import org.junit.jupiter.params.ParameterizedTest;
-import org.junit.jupiter.params.provider.Arguments;
 import org.junit.jupiter.params.provider.MethodSource;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.web.servlet.AutoConfigureMockMvc;
@@ -44,7 +42,7 @@ class TaskControllerTest {
     @ParameterizedTest
     void should_create_failed_when_given_null_task_name(CreateTaskDTO createTaskDTO) throws Exception {
         // given
-        when(taskService.create(any())).thenReturn(new Task());
+        when(taskService.createOrUpdate(any())).thenReturn(new Task());
         when(userService.fetchById(2L)).thenReturn(new User());
         // when
         mockMvc.perform(post("/tasks")
@@ -52,7 +50,7 @@ class TaskControllerTest {
                         .content(om.writeValueAsString(createTaskDTO)))
                 .andExpect(status().isBadRequest());
         // then
-        verify(taskService, never()).create(any());
+        verify(taskService, never()).createOrUpdate(any());
     }
 
     static Stream<CreateTaskDTO> createTaskProvider() {

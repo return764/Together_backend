@@ -13,6 +13,7 @@ import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
+import javax.validation.Valid;
 import java.util.List;
 
 @RestController
@@ -33,7 +34,7 @@ public class TaskController {
     }
 
     @PostMapping
-    public Task create(@RequestBody CreateTaskDTO createTaskDTO) {
+    public Task create(@RequestBody @Valid CreateTaskDTO createTaskDTO) {
         Task task = new Task();
         task.setName(createTaskDTO.getName());
         task.setDescription(createTaskDTO.getDescription());

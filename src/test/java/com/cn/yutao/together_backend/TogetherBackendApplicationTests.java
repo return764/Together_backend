@@ -13,6 +13,9 @@ import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Nested;
 import org.junit.jupiter.api.Test;
+import org.junit.jupiter.params.ParameterizedTest;
+import org.junit.jupiter.params.provider.EnumSource;
+import org.junit.jupiter.params.provider.ValueSource;
 import org.springframework.http.HttpEntity;
 import org.springframework.http.HttpMethod;
 import org.springframework.http.HttpStatus;
@@ -235,11 +238,12 @@ class TogetherBackendApplicationTests extends BasicSpringBootTest {
             assertThat(savedTask.getCreateAt()).isCloseTo(now, within(1, ChronoUnit.SECONDS));
         }
 
-        @Test
-        void should_change_task_state_to_1_when_complete_task() {
+        @EnumSource(value = TaskStatus.class)
+        @ParameterizedTest
+        void should_change_task_state_when_update_task(TaskStatus status) {
             // given
             UpdateTaskDTO task = new UpdateTaskDTO();
-            task.setStatus(TaskStatus.TO_EXAMINE.value());
+            task.setStatus(status.value());
             // when
             final var response = restTemplateWithLogin.exchange(
                     "/tasks/{id}",
@@ -250,7 +254,7 @@ class TogetherBackendApplicationTests extends BasicSpringBootTest {
             );
             // then
             assertThat(response.getStatusCode()).isEqualTo(HttpStatus.OK);
-            assertThat(response.getBody().getStatus()).isEqualTo(TaskStatus.TO_EXAMINE.value());
+            assertThat(response.getBody().getStatus()).isEqualTo(status.value());
         }
     }
 }

@@ -48,7 +48,7 @@ public class TaskController {
     }
 
     @PutMapping("/{id}")
-    public Task updateStatus(@PathVariable Long id, @RequestBody UpdateTaskDTO taskDTO) {
+    public Task updateStatus(@PathVariable Long id, @RequestBody @Valid UpdateTaskDTO taskDTO) {
         final var task = taskService.fetchTaskById(id);
         task.setStatus(taskDTO.getStatus());
         return taskService.createOrUpdate(task);

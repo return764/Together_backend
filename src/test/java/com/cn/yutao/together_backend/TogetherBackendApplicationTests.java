@@ -8,14 +8,12 @@ import com.cn.yutao.together_backend.entity.dto.LoginDTO;
 import com.cn.yutao.together_backend.entity.dto.UpdateTaskDTO;
 import com.cn.yutao.together_backend.entity.enums.TaskStatus;
 import com.cn.yutao.together_backend.exception.ErrorResult;
-import org.assertj.core.data.TemporalOffset;
 import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Nested;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.EnumSource;
-import org.junit.jupiter.params.provider.ValueSource;
 import org.springframework.http.HttpEntity;
 import org.springframework.http.HttpMethod;
 import org.springframework.http.HttpStatus;
@@ -145,7 +143,7 @@ class TogetherBackendApplicationTests extends BasicSpringBootTest {
                             userInDatabase.getId(),
                             "XXXXXX");
             // then
-            assertThat(responseEntity.getStatusCode()).isEqualTo(HttpStatus.INTERNAL_SERVER_ERROR);
+            assertThat(responseEntity.getStatusCode()).isEqualTo(HttpStatus.BAD_REQUEST);
             assertThat(responseEntity.getBody().getMessage()).isEqualTo("User not found.");
         }
 

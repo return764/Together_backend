@@ -1,6 +1,7 @@
 package com.cn.yutao.together_backend.service;
 
 import com.cn.yutao.together_backend.entity.User;
+import com.cn.yutao.together_backend.exception.UserDuplicationException;
 import com.cn.yutao.together_backend.repository.UserRepository;
 import com.cn.yutao.together_backend.utils.IdentifyCodeUtils;
 import com.cn.yutao.together_backend.utils.SecurityUtils;
@@ -19,6 +20,8 @@ import org.springframework.security.crypto.password.PasswordEncoder;
 import java.util.Optional;
 
 import static org.assertj.core.api.Assertions.assertThat;
+import static org.junit.jupiter.api.Assertions.assertThrows;
+import static org.mockito.Mockito.never;
 import static org.mockito.Mockito.times;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
@@ -40,10 +43,11 @@ class UserServiceTest {
     private String firstCode;
     private String secondCode;
     private MockedStatic<SecurityUtils> securityUtils;
+    private MockedStatic<IdentifyCodeUtils> identifyCodeUtils;
 
     @BeforeAll
     void beforeAll() {
-        Mockito.mockStatic(IdentifyCodeUtils.class);
+        identifyCodeUtils = Mockito.mockStatic(IdentifyCodeUtils.class);
         securityUtils = Mockito.mockStatic(SecurityUtils.class);
         firstCode = "111111";
         secondCode = "222222";
@@ -77,6 +81,18 @@ class UserServiceTest {
         // then
         assertThat(savedUser).isEqualTo(userStored);
         verify(repository).save(user);
+    }
+
+    @Test
+    void should_create_user_failed_when_given_same_username() {
+        // given
+        when(repository.findByUsername(user.getUsername())).thenReturn(Optional.of(user));
+        Mockito.when(IdentifyCodeUtils.genIdCode()).thenReturn(firstCode);
+        // when
+        // then
+        assertThrows(UserDuplicationException.class, () -> userService.createUser(user));
+        verify(repository, times(1)).findByUsername(user.getUsername());
+        verify(repository, never()).save(user);
     }
 
     @Test

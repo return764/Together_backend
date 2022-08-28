@@ -1,6 +1,7 @@
 package com.cn.yutao.together_backend.exception;
 
 
+import com.cn.yutao.together_backend.exception.base.BaseBadRequestException;
 import lombok.extern.log4j.Log4j2;
 import org.springframework.context.support.DefaultMessageSourceResolvable;
 import org.springframework.http.HttpStatus;
@@ -27,9 +28,9 @@ public class GlobalExceptionHandler {
         return new ErrorResult(errMessage);
     }
 
-    @ExceptionHandler(BindUserException.class)
+    @ExceptionHandler(BaseBadRequestException.class)
     @ResponseStatus(HttpStatus.BAD_REQUEST)
-    public ErrorResult handleBindUserException(BindUserException e) {
+    public ErrorResult handleBaseBadRequestException(BaseBadRequestException e) {
         return new ErrorResult(e.getMessage());
     }
 

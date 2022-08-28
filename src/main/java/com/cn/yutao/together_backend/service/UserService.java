@@ -2,6 +2,7 @@ package com.cn.yutao.together_backend.service;
 
 import com.cn.yutao.together_backend.entity.User;
 import com.cn.yutao.together_backend.exception.BindUserException;
+import com.cn.yutao.together_backend.exception.UserDuplicationException;
 import com.cn.yutao.together_backend.exception.UserNotFoundException;
 import com.cn.yutao.together_backend.repository.UserRepository;
 import com.cn.yutao.together_backend.utils.IdentifyCodeUtils;
@@ -25,6 +26,11 @@ public class UserService {
 
 
     public User createUser(User user) {
+        userRepository.findByUsername(user.getUsername())
+                .ifPresent(u -> {
+                    throw new UserDuplicationException(u.getUsername());
+                });
+
         user.setIdentifyCode(generateIdCode());
         user.setPassword(passwordEncoder.encode(user.getPassword()));
         return userRepository.save(user);
@@ -55,7 +61,7 @@ public class UserService {
 
     public void bind(User bindUser) {
         final User loginUser = SecurityUtils.getLoginUser();
-        if(Objects.equals(loginUser, bindUser)) {
+        if (Objects.equals(loginUser, bindUser)) {
             throw new BindUserException("Bind user failed: can't bind user self");
         }
         loginUser.setBinding(bindUser);

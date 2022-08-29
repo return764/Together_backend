@@ -108,7 +108,7 @@ public class UserControllerTest {
                             .content(om.writeValueAsString(loginDTO))
                     ).andExpect(status().isBadRequest())
                     .andExpect(content().contentType(MediaType.APPLICATION_JSON))
-                    .andExpect(jsonPath("$.message").value("password must be not blank"));
+                    .andExpect(jsonPath("$.message").value("密码不能为空"));
             verify(userService, never()).login(any());
         }
     }

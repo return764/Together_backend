@@ -82,7 +82,7 @@ class TogetherBackendApplicationTests extends BasicSpringBootTest {
 
             assertThat(responseEntity.getStatusCode()).isEqualTo(HttpStatus.BAD_REQUEST);
             assertThat(responseEntity.getHeaders().getContentType()).isEqualTo(MediaType.APPLICATION_JSON);
-            assertThat(Objects.requireNonNull(responseEntity.getBody()).getMessage()).contains("username must be not blank");
+            assertThat(Objects.requireNonNull(responseEntity.getBody()).getMessage()).contains("用户名不能为空");
         }
 
         @Test

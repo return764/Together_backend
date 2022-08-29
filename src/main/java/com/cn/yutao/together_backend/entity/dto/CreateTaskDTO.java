@@ -12,13 +12,13 @@ import java.time.LocalDateTime;
 @AllArgsConstructor
 @NoArgsConstructor
 public class CreateTaskDTO {
-    @NotNull(message = "Task name should not be null.")
+    @NotNull(message = "任务名不能为空")
     private String name;
-    @NotNull(message = "Task description should not be null.")
+    @NotNull(message = "任务描述不能为空")
     private String description;
-    @NotNull(message = "targetId should not be null.")
+    @NotNull(message = "任务目标用户id不能为空")
     private Long targetId;
-    @NotNull(message = "deadline should not be null.")
-    @Future(message = "deadline must in future.")
+    @NotNull(message = "截止时间不能为空")
+    @Future(message = "截止时间必须大于当前时间")
     private LocalDateTime deadline;
 }

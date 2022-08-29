@@ -159,7 +159,22 @@ class TogetherBackendApplicationTests extends BasicSpringBootTest {
                             userInDatabase.getIdentifyCode());
             // then
             assertThat(responseEntity.getStatusCode()).isEqualTo(HttpStatus.BAD_REQUEST);
-            assertThat(responseEntity.getBody().getMessage()).contains("Bind user failed");
+            assertThat(responseEntity.getBody().getMessage()).contains("绑定用户失败：不能绑定自己");
+        }
+
+        @Test
+        void should_bind_failed_when_bind_some_one_already_bind() {
+            // given
+            // when
+            final var responseEntity = restTemplateWithLogin
+                    .postForEntity("/users/{id}/binding/{identifyCode}",
+                            null,
+                            ErrorResult.class,
+                            userInDatabase.getId(),
+                            userInDatabase4.getIdentifyCode());
+            // then
+            assertThat(responseEntity.getStatusCode()).isEqualTo(HttpStatus.BAD_REQUEST);
+            assertThat(responseEntity.getBody().getMessage()).contains("绑定用户失败：用户已被绑定");
         }
     }
 

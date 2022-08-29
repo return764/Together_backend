@@ -62,8 +62,13 @@ public class UserService {
     public void bind(User bindUser) {
         final User loginUser = SecurityUtils.getLoginUser();
         if (Objects.equals(loginUser, bindUser)) {
-            throw new BindUserException("Bind user failed: can't bind user self");
+            throw new BindUserException("绑定用户失败：不能绑定自己");
         }
+
+        if (Objects.nonNull(bindUser.getBinding()) || Objects.nonNull(Objects.requireNonNull(loginUser).getBinding())) {
+            throw new BindUserException("绑定用户失败：用户已被绑定");
+        }
+
         loginUser.setBinding(bindUser);
         userRepository.save(loginUser);
         bindUser.setBinding(loginUser);

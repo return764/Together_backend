@@ -15,6 +15,8 @@ import org.springframework.boot.test.web.client.TestRestTemplate;
 public class BasicSpringBootTest {
     protected User userInDatabase;
     protected User userInDatabase2;
+    protected User userInDatabase3;
+    protected User userInDatabase4;
     protected User userInDatabase2WithoutPassword;
     protected String originPwd;
     @Autowired
@@ -38,8 +40,22 @@ public class BasicSpringBootTest {
                 .password(originPwd)
                 .nickname("tNname2")
                 .build();
+        userInDatabase3 = User.builder()
+                .username("tUname3")
+                .password(originPwd)
+                .nickname("tNname3")
+                .build();
+        userInDatabase4 = User.builder()
+                .username("tUname4")
+                .password(originPwd)
+                .nickname("tNname4")
+                .binding(userInDatabase3)
+                .build();
         userService.createUser(userInDatabase);
         userService.createUser(userInDatabase2);
+        userService.createUser(userInDatabase3);
+        userService.createUser(userInDatabase4);
+
         userInDatabase2WithoutPassword = new User();
         BeanUtils.copyProperties(userInDatabase2, userInDatabase2WithoutPassword);
         userInDatabase2WithoutPassword.setPassword(null);

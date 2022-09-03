@@ -5,10 +5,12 @@ import com.cn.yutao.together_backend.entity.User;
 import com.cn.yutao.together_backend.entity.dto.CreateUserDTO;
 import com.cn.yutao.together_backend.entity.dto.LoginDTO;
 import com.cn.yutao.together_backend.service.UserService;
+import com.cn.yutao.together_backend.utils.SecurityUtils;
 import org.springframework.beans.BeanUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
+import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
@@ -46,6 +48,12 @@ public class UserController {
         User user = userService.fetchByIdentifyCode(identifyCode);
         userService.bind(user);
         return userService.fetchById(id);
+    }
+
+    @GetMapping("/refreshing")
+    public User refreshing() {
+        final var loginUser = SecurityUtils.getLoginUser();
+        return userService.refresh(loginUser);
     }
 
 }

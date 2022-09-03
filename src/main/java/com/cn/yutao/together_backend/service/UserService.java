@@ -78,4 +78,10 @@ public class UserService {
     public User fetchById(Long id) {
         return userRepository.findById(id).orElseThrow(() -> new UserNotFoundException("User not found."));
     }
+
+    public User refresh(User loginUser) {
+        final var refreshedUser = fetchById(loginUser.getId());
+        SecurityUtils.refresh(refreshedUser);
+        return refreshedUser;
+    }
 }

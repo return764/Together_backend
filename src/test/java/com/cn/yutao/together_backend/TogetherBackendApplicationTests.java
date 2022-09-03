@@ -176,6 +176,19 @@ class TogetherBackendApplicationTests extends BasicSpringBootTest {
             assertThat(responseEntity.getStatusCode()).isEqualTo(HttpStatus.BAD_REQUEST);
             assertThat(responseEntity.getBody().getMessage()).contains("绑定用户失败：用户已被绑定");
         }
+
+        @Test
+        void should_refresh_user() {
+            // given
+            // when
+            final var responseEntity = restTemplateWithLogin
+                    .getForEntity("/users/refreshing",
+                            User.class);
+            // then
+            assertThat(responseEntity.getStatusCode()).isEqualTo(HttpStatus.OK);
+            final var body = responseEntity.getBody();
+            assertThat(body.getId()).isEqualTo(userInDatabase.getId());
+        }
     }
 
     @Nested

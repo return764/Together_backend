@@ -44,6 +44,7 @@ public class TaskController {
         task.setSourceUser(SecurityUtils.getLoginUser());
         task.setTargetUser(userService.fetchById(createTaskDTO.getTargetId()));
         task.setDeadline(createTaskDTO.getDeadline());
+        task.setPoint(createTaskDTO.getPoint());
         return taskService.createOrUpdate(task);
     }
 

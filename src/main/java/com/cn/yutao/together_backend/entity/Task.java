@@ -45,6 +45,7 @@ public class Task {
     private String name;
     private String description;
     private Integer status;
+    private Integer point;
 
     @ManyToOne
     @JoinColumn(name = "source_user_id")

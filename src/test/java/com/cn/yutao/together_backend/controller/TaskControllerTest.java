@@ -60,11 +60,12 @@ class TaskControllerTest {
 
     static Stream<CreateTaskDTO> createTaskProvider() {
         return Stream.of(
-                new CreateTaskDTO(null, "test", 2L, LocalDateTime.now().plusDays(1)),
-                new CreateTaskDTO("test", null, 2L, LocalDateTime.now().plusDays(1)),
-                new CreateTaskDTO("test", "test", null, LocalDateTime.now().plusDays(1)),
-                new CreateTaskDTO("test", "test", 2L, null),
-                new CreateTaskDTO("test", "test", 2L, LocalDateTime.now().minusDays(1))
+                new CreateTaskDTO(null, "test", 2L, 10, LocalDateTime.now().plusDays(1)),
+                new CreateTaskDTO("test", null, 2L, 10, LocalDateTime.now().plusDays(1)),
+                new CreateTaskDTO("test", "test", null, 10, LocalDateTime.now().plusDays(1)),
+                new CreateTaskDTO("test", "test", 2L, 10, null),
+                new CreateTaskDTO("test", "test", 2L, 10, LocalDateTime.now().minusDays(1)),
+                new CreateTaskDTO("test", "test", 2L, null, LocalDateTime.now().plusDays(1))
         );
     }
 

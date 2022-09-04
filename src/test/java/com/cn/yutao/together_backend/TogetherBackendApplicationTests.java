@@ -250,6 +250,7 @@ class TogetherBackendApplicationTests extends BasicSpringBootTest {
             createTaskDTO.setDescription("test");
             createTaskDTO.setTargetId(userInDatabase2.getId());
             createTaskDTO.setDeadline(now.plusDays(1));
+            createTaskDTO.setPoint(12);
             // when
             final var responseEntity = restTemplateWithLogin
                     .postForEntity("/tasks", createTaskDTO, Task.class);
@@ -260,6 +261,7 @@ class TogetherBackendApplicationTests extends BasicSpringBootTest {
             assertThat(savedTask.getStatus()).isEqualTo(TaskStatus.UNCOMPLETED.value());
             assertThat(savedTask.getSourceUser().getId()).isEqualTo(userInDatabase.getId());
             assertThat(savedTask.getTargetUser().getId()).isEqualTo(userInDatabase2.getId());
+            assertThat(savedTask.getPoint()).isEqualTo(createTaskDTO.getPoint());
             assertThat(savedTask.getDeadline()).isEqualTo(createTaskDTO.getDeadline());
             assertThat(savedTask.getCreateAt()).isCloseTo(now, within(1, ChronoUnit.SECONDS));
         }

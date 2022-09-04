@@ -18,6 +18,8 @@ public class CreateTaskDTO {
     private String description;
     @NotNull(message = "任务目标用户id不能为空")
     private Long targetId;
+    @NotNull(message = "任务积分不能为空")
+    private Integer point;
     @NotNull(message = "截止时间不能为空")
     @Future(message = "截止时间必须大于当前时间")
     private LocalDateTime deadline;

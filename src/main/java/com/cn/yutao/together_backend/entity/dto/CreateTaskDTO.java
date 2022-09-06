@@ -1,5 +1,6 @@
 package com.cn.yutao.together_backend.entity.dto;
 
+import com.fasterxml.jackson.annotation.JsonFormat;
 import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
@@ -22,5 +23,6 @@ public class CreateTaskDTO {
     private Integer point;
     @NotNull(message = "截止时间不能为空")
     @Future(message = "截止时间必须大于当前时间")
+    @JsonFormat(pattern = "yyyy-MM-dd HH:mm:ss")
     private LocalDateTime deadline;
 }
